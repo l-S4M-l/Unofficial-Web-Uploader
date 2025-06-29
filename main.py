@@ -144,6 +144,13 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
             except Exception:
                 continue
         
+        if window_title == None:
+            self.popup("failed to get skate 3 version handle")
+            self.clickme.setEnabled(False)
+
+            self.backup_button.setEnabled(False)
+            return
+        
         blus = "blus" in window_title.lower()
         bles = "bles" in window_title.lower()
         
