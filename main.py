@@ -326,6 +326,9 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 		if os.path.exists(folder) == False:
 			self.popup("no backup folder found")
 			return
+		
+		if len(os.listdir(folder)) == 0:
+			self.popup("no backup file exists")
 
 		files = sorted(os.listdir(folder), key=lambda f: os.path.getmtime(os.path.join(folder, f)), reverse=True)
 
@@ -348,101 +351,107 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 		self.progress_bar.setValue(0)
 
 	def recipe_clicked(self):
-		self.overlay.setGeometry(QtCore.QRect(-20, 0, 851, 511)) # putting the overlay on
-
-		self.progress_update("reading recipe", 10)
-
-		# reading and converting textures
-		recipe_bytes = self.rpcs3_process.read_recipe()
-
-		recipe = Recipe(recipe_bytes=recipe_bytes, recipe_type=RecipeTypes.CREATEACHARACTER)
-
-		if os.path.exists(f"{self.cwd}/backup_recipes") == False:
-			os.mkdir(f"{self.cwd}/backup_recipes")
-
-		
-		with open(f"{self.cwd}/backup_recipes/{int(time.time())}.recipe","wb") as file:
-			recipe_bytes = recipe.get_bytes()
-			padded_result = recipe_bytes.ljust(6500, b'\x00')
-			file.write(padded_result)
-			self.backup_button.setEnabled(True)
-
-		self.progress_update("reading diffuse texture list", 20)
-
-		Texture_list = {}
-
-		for asset in recipe.asset_lists:
-			for texture in asset.assets[0].Models[0].Textures:
-				if texture.texture_channel == "diffuse":
-					Texture_list[asset.asset_folder_name] = Helpers.file_name_bytes_to_string(texture.texture_name)
-
-		
-		self.progress_update("getting rpcs3 and game path", 35)
-
-		exe_path, region = self.get_skate3_path()
-
-		root_path = "/".join(exe_path.split("\\")[:-1])
-
-		with open(f"{root_path}/config/games.yml") as file:
-			games_data = file.read()
-			file.close()
-
-		games_data = games_data.split("\n")
-
-		for i in games_data:
-			if region.lower() in i.lower():
-				game_path = i.split(": ")[1].replace("//","/")
-
 		try:
-			if game_path != None:
+			self.overlay.setGeometry(QtCore.QRect(-20, 0, 851, 511)) # putting the overlay on
 
-				createacharacter_path = f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter/texture"
+			self.progress_update("reading recipe", 10)
 
-				if os.path.exists(f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter/texture") == False:
-					self.popup("you don't have your createacharacter.big\nfile extracted.")
-					self.progress_cancel()
-					return
+			# reading and converting textures
+			recipe_bytes = self.rpcs3_process.read_recipe()
+
+			recipe = Recipe(recipe_bytes=recipe_bytes, recipe_type=RecipeTypes.CREATEACHARACTER)
+
+			if os.path.exists(f"{self.cwd}/backup_recipes") == False:
+				os.mkdir(f"{self.cwd}/backup_recipes")
+
+			
+			with open(f"{self.cwd}/backup_recipes/{int(time.time())}.recipe","wb") as file:
+				recipe_bytes = recipe.get_bytes()
+				padded_result = recipe_bytes.ljust(6500, b'\x00')
+				file.write(padded_result)
+				self.backup_button.setEnabled(True)
+
+			self.progress_update("reading diffuse texture list", 20)
+
+			Texture_list = {}
+
+			for asset in recipe.asset_lists:
+				for texture in asset.assets[0].Models[0].Textures:
+					if texture.texture_channel == "diffuse":
+						Texture_list[asset.asset_folder_name] = Helpers.file_name_bytes_to_string(texture.texture_name)
+
+			
+			self.progress_update("getting rpcs3 and game path", 35)
+
+			exe_path, region = self.get_skate3_path()
+
+			root_path = "/".join(exe_path.split("\\")[:-1])
+
+			with open(f"{root_path}/config/games.yml") as file:
+				games_data = file.read()
+				file.close()
+
+			games_data = games_data.split("\n")
+
+			for i in games_data:
+				if region.lower() in i.lower():
+					game_path = i.split(": ")[1].replace("//","/")
+
+			try:
+				if game_path != None:
+
+					createacharacter_path = f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter/texture"
+
+					if os.path.exists(f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter/texture") == False:
+						self.popup("you don't have your createacharacter.big\nfile extracted.")
+						self.progress_cancel()
+						return
 
 
-				if os.path.exists(f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter.big") == True:
-					self.popup("you don't have your createacharacter.big\nfile extracted.")
-					self.progress_cancel()
-					return
+					if os.path.exists(f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter.big") == True:
+						self.popup("you don't have your createacharacter.big\nfile extracted.")
+						self.progress_cancel()
+						return
 
-				changed_textures = {}
-				for asset_name in Texture_list.keys():
-					texture = Texture_list[asset_name]
+					changed_textures = {}
+					for asset_name in Texture_list.keys():
+						texture = Texture_list[asset_name]
+						
+						if os.path.exists(f"{createacharacter_path}/{texture}"):
+							with open(f"{createacharacter_path}/{texture}", "rb") as file:
+								psg_bytes = file.read()
+
+
+							current_hash = hashlib.md5(psg_bytes).hexdigest()
+							file_hash = self.db_handle.get_file_hash(texture)
+
+							if file_hash != current_hash:
+								changed_textures[asset_name] = texture
+						
+						else:
+							print("most likley dlc skipping item")
 					
-					if os.path.exists(f"{createacharacter_path}/{texture}"):
-						with open(f"{createacharacter_path}/{texture}", "rb") as file:
-							psg_bytes = file.read()
+					if len(changed_textures.keys()) > 5:
+						self.popup("too many textures max is 5", ok_callback=self.toomany_logos_pop_callback, callback_args=(changed_textures,createacharacter_path, recipe))
 
-
-						current_hash = hashlib.md5(psg_bytes).hexdigest()
-						file_hash = self.db_handle.get_file_hash(texture)
-
-						if file_hash != current_hash:
-							changed_textures[asset_name] = texture
-					
 					else:
-						print("most likley dlc skipping item")
-				
-				if len(changed_textures.keys()) > 5:
-					self.popup("too many textures max is 5", ok_callback=self.toomany_logos_pop_callback, callback_args=(changed_textures,createacharacter_path, recipe))
+						self.worker_start(changed_textures,createacharacter_path,recipe)
+
+
+
+
+
 
 				else:
-					self.worker_start(changed_textures,createacharacter_path,recipe)
+					return None
+			except Exception as e:
+				raise e
+				print(e)
 
-
-
-
-
-
-			else:
-				return None
 		except Exception as e:
-			raise e
-			print(e)
+			self.popup(f"failed\n{e}")
+			self.progress_cancel()
+
 
 	def toomany_logos_pop_callback(self,args:tuple=()):
 		self.toomanylogos_ui = too_many_textures()
