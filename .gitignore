@@ -1,0 +1,13 @@
+backup_recipes
+build
+.vscode
+__pycache__
+.venv
+dist
+demo recipe write.py
+github_token.txt
+testing.py
+components/env.py
+UWU final compile
+main.spec
+proxy.spec
