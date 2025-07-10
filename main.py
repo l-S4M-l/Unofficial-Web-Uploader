@@ -27,7 +27,7 @@ import random
 from flask import Flask, request
 import requests
 import webbrowser
-from components.env import env
+from components.env import env_class
 from werkzeug.serving import make_server
 
 
@@ -137,7 +137,7 @@ class OAuthServerThread(QtCore.QThread):
 			headers = {'Accept': 'application/json'}
 			data = {
 				"client_id": "Ov23liIjsHpUC27r5Xe2",
-				"client_secret": env.github_secret,
+				"client_secret": env_class().github_secret,
 				"code": code,
 				"redirect_uri": REDIRECT_URI,
 			}

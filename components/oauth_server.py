@@ -3,7 +3,7 @@ from flask import Flask, request
 import requests
 import sys
 import time
-from env import env
+from components.env import env_class
 
 def run_oauth_server(Q):
     app = Flask(__name__)
@@ -24,7 +24,7 @@ def run_oauth_server(Q):
         headers = {'Accept': 'application/json'}
         data = {
             "client_id": "Ov23liIjsHpUC27r5Xe2",
-            "client_secret": env.github_secret,
+            "client_secret": env_class().github_secret,
             "code": code,
             "redirect_uri": REDIRECT_URI,
         }
