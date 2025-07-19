@@ -401,7 +401,7 @@ QCheckBox::indicator:checked:disabled {
     <property name="geometry">
      <rect>
       <x>-20</x>
-      <y>10000</y>
+      <y>0</y>
       <width>851</width>
       <height>511</height>
      </rect>
@@ -534,6 +534,22 @@ margin:0px;
      <string>shuffle textures</string>
     </property>
    </widget>
+   <zorder>bg_main</zorder>
+   <zorder>label_2</zorder>
+   <zorder>label_3</zorder>
+   <zorder>label_4</zorder>
+   <zorder>label_5</zorder>
+   <zorder>label_6</zorder>
+   <zorder>github</zorder>
+   <zorder>attach_game</zorder>
+   <zorder>clickme</zorder>
+   <zorder>status</zorder>
+   <zorder>statusCircle</zorder>
+   <zorder>attach_status</zorder>
+   <zorder>backup_button</zorder>
+   <zorder>DeleteRepos</zorder>
+   <zorder>shuffle_arena</zorder>
+   <zorder>overlay</zorder>
   </widget>
   <widget class="QFrame" name="titlebar_cont">
    <property name="geometry">
