@@ -269,6 +269,22 @@ class Ui_Form(object):
 "margin:0px;\n"
 "}")
         self.shuffle_arena.setObjectName("shuffle_arena")
+        self.bg_main.raise_()
+        self.label_2.raise_()
+        self.label_3.raise_()
+        self.label_4.raise_()
+        self.label_5.raise_()
+        self.label_6.raise_()
+        self.github.raise_()
+        self.attach_game.raise_()
+        self.clickme.raise_()
+        self.status.raise_()
+        self.statusCircle.raise_()
+        self.attach_status.raise_()
+        self.backup_button.raise_()
+        self.DeleteRepos.raise_()
+        self.shuffle_arena.raise_()
+        self.overlay.raise_()
         self.titlebar_cont = QtWidgets.QFrame(Form)
         self.titlebar_cont.setGeometry(QtCore.QRect(10, 0, 831, 21))
         self.titlebar_cont.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -297,6 +313,11 @@ class Ui_Form(object):
         self.label.setGeometry(QtCore.QRect(9, -1, 301, 21))
         self.label.setStyleSheet("font: 5 12pt \"Montserrat Medium\";")
         self.label.setObjectName("label")
+        self.version_number = QtWidgets.QLabel(self.titlebar_cont)
+        self.version_number.setGeometry(QtCore.QRect(60, 0, 47, 21))
+        self.version_number.setStyleSheet("font: 87 8pt \"Montserrat Black\";\n"
+"color: rgb(121, 121, 121);")
+        self.version_number.setObjectName("version_number")
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -320,6 +341,7 @@ class Ui_Form(object):
         self.close_but.setText(_translate("Form", "x"))
         self.mini_but.setText(_translate("Form", "-"))
         self.label.setText(_translate("Form", "UWU"))
+        self.version_number.setText(_translate("Form", "1.0.0"))
 
 
 if __name__ == "__main__":

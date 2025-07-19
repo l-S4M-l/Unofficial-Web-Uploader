@@ -401,7 +401,7 @@ QCheckBox::indicator:checked:disabled {
     <property name="geometry">
      <rect>
       <x>-20</x>
-      <y>0</y>
+      <y>10000</y>
       <width>851</width>
       <height>511</height>
      </rect>
@@ -634,6 +634,23 @@ background-color:transparent;</string>
     </property>
     <property name="text">
      <string>UWU</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="version_number">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>0</y>
+      <width>47</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 87 8pt &quot;Montserrat Black&quot;;
+color: rgb(121, 121, 121);</string>
+    </property>
+    <property name="text">
+     <string>1.0.0</string>
     </property>
    </widget>
   </widget>

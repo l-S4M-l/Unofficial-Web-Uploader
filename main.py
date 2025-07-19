@@ -31,6 +31,9 @@ from components.env import env_class
 from werkzeug.serving import make_server
 
 
+version = "1.0.0"
+
+
 class logo_worker(QtCore.QThread):
 	update_percent = QtCore.pyqtSignal(str,int)
 	done_signal = QtCore.pyqtSignal(dict,Recipe)
@@ -180,6 +183,8 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 		self.delete_old_repos = True
 		self.DeleteRepos = cast(QtWidgets.QCheckBox, self.DeleteRepos)
 		self.DeleteRepos.setChecked(self.delete_old_repos)
+
+		self.version_number.setText(version)
 
 		if os.path.exists("github_token.txt"):
 				with open("github_token.txt", "r") as file:
