@@ -224,3 +224,7 @@ class Helpers:
         
         return results
 
+
+
+if __name__ == "__main__":
+    Helpers().file_name_bytes_to_string()

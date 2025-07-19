@@ -211,6 +211,7 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 		self.clickme.clicked.connect(self.recipe_clicked)
 		self.backup_button.clicked.connect(self.load_backup_recipe)
 		self.DeleteRepos.clicked.connect(self.delete_repos)
+		self.shuffle_arena.clicked.connect(self.shuffle_recipe)
 		
 	def delete_repos(self):
 		self.delete_old_repos = self.DeleteRepos.isChecked()
@@ -228,7 +229,6 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 		url = f"https://github.com/login/oauth/authorize?{urllib.parse.urlencode(params)}"
 		webbrowser.open(url)
 
-	
 	def github_return(self,token):
 
 		if token != None:
@@ -245,7 +245,6 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 
 		self.github_login_worker.wait()
 
-	
 	def github_status(self,status:bool):
 		if status == True:
 			self.statusCircle.setStyleSheet("""
@@ -278,11 +277,12 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 			self.attach_status.setText("RPCS3 Attached")
 
 			self.clickme.setEnabled(True)
+			self.shuffle_arena.setEnabled(True)
 
 			self.backup_button.setEnabled(self.backup_on)
 
 		except:
-			print("failed to attach to rpcs3")
+			self.popup("failed to attach to rpcs3")
 	
 	def get_skate3_path(self):
 		PID = self.rpcs3_process.process.process_id
@@ -302,6 +302,7 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 		if window_title == None:
 			self.popup("failed to get skate 3 version handle")
 			self.clickme.setEnabled(False)
+			self.shuffle_arena.setEnabled(False)
 
 			self.backup_button.setEnabled(False)
 			return
@@ -339,6 +340,7 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 
 		self.popup("backup Loaded")
 
+
 	def progress_update(self, message, percentage):
 		self.progress_message = cast(QtWidgets.QLabel, self.progress_message)
 		self.progress_message.setText(message)
@@ -350,6 +352,7 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 		self.overlay.setGeometry(QtCore.QRect(-20, 10000, 851, 511))
 		self.progress_bar.setValue(0)
 
+
 	def recipe_clicked(self):
 		try:
 			self.overlay.setGeometry(QtCore.QRect(-20, 0, 851, 511)) # putting the overlay on
@@ -360,6 +363,13 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 			recipe_bytes = self.rpcs3_process.read_recipe()
 
 			recipe = Recipe(recipe_bytes=recipe_bytes, recipe_type=RecipeTypes.CREATEACHARACTER)
+
+			for graphics_block in recipe.graphic_blocks:
+				graphics_block
+				if "http://127.0.0.1" in graphics_block.URL:
+					self.popup("this recipe already has custom graphics")
+					self.progress_cancel()
+					return
 
 			if os.path.exists(f"{self.cwd}/backup_recipes") == False:
 				os.mkdir(f"{self.cwd}/backup_recipes")
@@ -394,13 +404,19 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 			games_data = games_data.split("\n")
 
 			for i in games_data:
-				if region.lower() in i.lower():
+				if (f"{region.lower()}00760" in i.lower()) or (f"{region.lower()}30464" in i.lower()):
 					game_path = i.split(": ")[1].replace("//","/")
 
 			try:
 				if game_path != None:
 
 					createacharacter_path = f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter/texture"
+
+					print(createacharacter_path)
+					print(f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter/texture")
+					print(os.path.exists(f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter/texture") == False)
+					print(f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter.big")
+					print(os.path.exists(f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter.big") == True)
 
 					if os.path.exists(f"{game_path}PS3_GAME/USRDIR/data/content/createacharacter/texture") == False:
 						self.popup("you don't have your createacharacter.big\nfile extracted.")
@@ -452,6 +468,53 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 			self.popup(f"failed\n{e}")
 			self.progress_cancel()
 
+	def shuffle_recipe(self):
+		recipe_bytes = self.rpcs3_process.read_recipe()
+		
+		recipe = Recipe(recipe_bytes=recipe_bytes, recipe_type=RecipeTypes.CREATEACHARACTER)
+
+		github_graphics = False
+
+		for graphics_block in recipe.graphic_blocks:
+				graphics_block
+				if "http://127.0.0.1" in graphics_block.URL:
+					
+					github_graphics = True
+
+
+		if github_graphics == False:
+			return
+		
+		current_asset_list = []
+
+		for graphic_block in recipe.graphic_blocks:
+			if "http://127.0.0.1" in graphics_block.URL:
+
+				for asset_list in recipe.asset_lists:
+					asset_list = cast(AssetList, asset_list)
+
+					if asset_list.asset_folder_name == "Misc":
+						misc = asset_list
+						for decal in misc.assets[0].Models:
+							if decal.MaterialID == graphic_block.MaterialID:
+								graphic_decal = decal
+								
+		
+		for asset_list in recipe.asset_lists:
+			if asset_list.asset_folder_name != "Misc":
+				asset_list = cast(AssetList, asset_list)
+				for texture in asset_list.assets[0].Models[0].Textures:
+					texture = cast(Texture, texture)
+
+					if texture.texture_channel == "diffuse":
+						
+						if texture.texture_name == graphic_decal.Textures[0].texture_name:
+							random_arena = Helpers.random_high_res_arena()
+							texture.texture_name = random_arena
+							graphic_decal.Textures[0].texture_name = random_arena
+
+
+		self.rpcs3_process.write_recipe(recipe.get_bytes())
 
 	def toomany_logos_pop_callback(self,args:tuple=()):
 		self.toomanylogos_ui = too_many_textures()
@@ -551,6 +614,7 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 				break
 
 		return recipe
+
 
 	def popup(self, message, ok_callback = lambda:None, titlebar_title = "Popup", callback_args:tuple=()):
 		self.popup_ui = popup_ui()

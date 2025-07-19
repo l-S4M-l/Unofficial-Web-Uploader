@@ -120,7 +120,7 @@ font-weight:bold;
 </string>
     </property>
     <property name="text">
-     <string>Attach to RPCS3</string>
+     <string>Attach to SKATE 3</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -496,6 +496,43 @@ border-radius:6px;
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="shuffle_arena">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>190</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">.QPushButton{
+background-color: rgb(0, 154, 255);
+border-radius:6px;
+border:2px solid rgb(5, 15, 20);
+margin:1px;
+	font: 63 12pt &quot;Montserrat SemiBold&quot;;
+}
+
+.QPushButton::hover{
+background-color: rgb(0, 113, 188);
+}
+
+.QPushButton::disabled{
+background-color:grey;
+}
+
+.QPushButton::pressed{
+margin:0px;
+}</string>
+    </property>
+    <property name="text">
+     <string>shuffle textures</string>
+    </property>
    </widget>
   </widget>
   <widget class="QFrame" name="titlebar_cont">

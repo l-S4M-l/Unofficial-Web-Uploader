@@ -246,6 +246,29 @@ class Ui_Form(object):
         self.progress_message.setStyleSheet("font: 81 15pt \"Montserrat ExtraBold\";")
         self.progress_message.setAlignment(QtCore.Qt.AlignCenter)
         self.progress_message.setObjectName("progress_message")
+        self.shuffle_arena = QtWidgets.QPushButton(self.main)
+        self.shuffle_arena.setEnabled(False)
+        self.shuffle_arena.setGeometry(QtCore.QRect(620, 190, 151, 31))
+        self.shuffle_arena.setStyleSheet(".QPushButton{\n"
+"background-color: rgb(0, 154, 255);\n"
+"border-radius:6px;\n"
+"border:2px solid rgb(5, 15, 20);\n"
+"margin:1px;\n"
+"    font: 63 12pt \"Montserrat SemiBold\";\n"
+"}\n"
+"\n"
+".QPushButton::hover{\n"
+"background-color: rgb(0, 113, 188);\n"
+"}\n"
+"\n"
+".QPushButton::disabled{\n"
+"background-color:grey;\n"
+"}\n"
+"\n"
+".QPushButton::pressed{\n"
+"margin:0px;\n"
+"}")
+        self.shuffle_arena.setObjectName("shuffle_arena")
         self.titlebar_cont = QtWidgets.QFrame(Form)
         self.titlebar_cont.setGeometry(QtCore.QRect(10, 0, 831, 21))
         self.titlebar_cont.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -282,7 +305,7 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.label_4.setText(_translate("Form", "Connect Github"))
-        self.label_5.setText(_translate("Form", "Attach to RPCS3"))
+        self.label_5.setText(_translate("Form", "Attach to SKATE 3"))
         self.label_6.setText(_translate("Form", "Click!"))
         self.github.setText(_translate("Form", "Connect"))
         self.attach_game.setText(_translate("Form", "Attach"))
@@ -293,6 +316,7 @@ class Ui_Form(object):
         self.DeleteRepos.setText(_translate("Form", "DELETE OLD REPOS"))
         self.label_7.setText(_translate("Form", "Loading..."))
         self.progress_message.setText(_translate("Form", "Message"))
+        self.shuffle_arena.setText(_translate("Form", "shuffle textures"))
         self.close_but.setText(_translate("Form", "x"))
         self.mini_but.setText(_translate("Form", "-"))
         self.label.setText(_translate("Form", "UWU"))

@@ -123,9 +123,9 @@ class logoconverter():
 
         
 if __name__ == "__main__":
-    logoconverter = logoconverter()
+    logoconverter2 = logoconverter()
     #a = logoconverter.rw_hash64_string(f"206.Texture", 0xcbf29ce484222325)
     #a = logoconverter.convert(logoconverter.cwd, "206")
-    a = logoconverter.psg_to_png(f"{logoconverter.cwd}/assets/PsgCliTool/206.psg", logoconverter.cwd)
+    hash:bytes = logoconverter2.rw_hash64_string(f"7812768368712.Texture", 0xcbf29ce484222325)
 
-    print(a)
+    print(hash.hex())
