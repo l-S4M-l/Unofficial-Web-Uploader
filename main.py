@@ -516,6 +516,8 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 
 		self.rpcs3_process.write_recipe(recipe.get_bytes())
 
+		self.popup("Custom texture arenas shuffled")
+
 	def toomany_logos_pop_callback(self,args:tuple=()):
 		self.toomanylogos_ui = too_many_textures()
 		self.toomanylogos_ui.setupUi(self.toomanylogos_ui,args)
