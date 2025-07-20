@@ -10,13 +10,13 @@ from typing import cast
 import urllib.parse
 from components.rpcs3_handle import rpcs3_mem
 from components.psg import logoconverter
-from recipe_library.Recipe import Recipe, RecipeTypes
-from recipe_library.GraphicBlock import GraphicBlock
-from recipe_library.Asset import Asset
-from recipe_library.AssetList import AssetList
-from recipe_library.Model import Model
-from recipe_library.texture import Texture
-from recipe_library.Helpers import Helpers
+from S3RecipeHandler.Recipe import Recipe, RecipeTypes
+from S3RecipeHandler.GraphicBlock import GraphicBlock
+from S3RecipeHandler.Asset import Asset
+from S3RecipeHandler.AssetList import AssetList
+from S3RecipeHandler.Model import Model
+from S3RecipeHandler.texture import Texture
+from S3RecipeHandler.Helpers import Helpers
 from components.database_handler import database
 import psutil
 import pygetwindow as gw
