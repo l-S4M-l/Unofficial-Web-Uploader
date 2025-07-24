@@ -29,9 +29,10 @@ import requests
 import webbrowser
 from components.env import env_class
 from werkzeug.serving import make_server
+import json
 
 
-version = "1.0.0"
+version = "1.1.0"
 
 
 class logo_worker(QtCore.QThread):
@@ -200,7 +201,7 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 
 		try:
 			if os.path.exists(f"{self.cwd}/backup_recipes") == True:
-				if "recipe" in os.listdir(f"{self.cwd}/backup_recipes")[0]:
+				if "rson" in os.listdir(f"{self.cwd}/backup_recipes")[0] or "recipe" in os.listdir(f"{self.cwd}/backup_recipes")[0]:
 					self.backup_button:QtWidgets.QPushButton = self.backup_button
 					self.backup_on = True
 		except:
@@ -339,9 +340,13 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 		files = sorted(os.listdir(folder), key=lambda f: os.path.getmtime(os.path.join(folder, f)), reverse=True)
 
 		with open(f"{folder}/{files[0]}","rb") as file:
-			backup_recipe_bytes = file.read()
-		
-		self.rpcs3_process.write_recipe(backup_recipe_bytes)
+			if "rson" in files[0]:
+				backup_recipe_json = json.loads(file.read())
+				backup_recipe = Recipe(Recipe_Json=backup_recipe_json)
+			elif "recipe" in files[0]:
+				backup_recipe = Recipe(recipe_bytes=file.read())
+
+		self.rpcs3_process.write_recipe(backup_recipe.get_bytes())
 
 		self.popup("backup Loaded")
 
@@ -367,7 +372,7 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 			# reading and converting textures
 			recipe_bytes = self.rpcs3_process.read_recipe()
 
-			recipe = Recipe(recipe_bytes=recipe_bytes, recipe_type=RecipeTypes.CREATEACHARACTER)
+			recipe:Recipe = Recipe(recipe_bytes=recipe_bytes, recipe_type=RecipeTypes.CREATEACHARACTER)
 
 			for graphics_block in recipe.graphic_blocks:
 				graphics_block
@@ -380,10 +385,9 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 				os.mkdir(f"{self.cwd}/backup_recipes")
 
 			
-			with open(f"{self.cwd}/backup_recipes/{int(time.time())}.recipe","wb") as file:
-				recipe_bytes = recipe.get_bytes()
-				padded_result = recipe_bytes.ljust(6500, b'\x00')
-				file.write(padded_result)
+			with open(f"{self.cwd}/backup_recipes/{int(time.time())}.rson","w") as file:
+				recipe_json = recipe.to_json()
+				file.write(json.dumps(recipe_json, indent=4))
 				self.backup_button.setEnabled(True)
 
 			self.progress_update("reading diffuse texture list", 20)
