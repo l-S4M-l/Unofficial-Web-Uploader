@@ -10,7 +10,11 @@ class logoconverter():
         self.rw_64_PRIME = 0x100000001b3
 
     def image_to_dds(self,texture_path,input_image_path):
-        subprocess.run(f'assets/texconv.exe -y -f DXT5 -m 10 -o "{texture_path}" "{input_image_path}"')
+        #'M:/Skate 3 Modding and saves/xbox modding/coding/UWU/output_textures/9885699367.png'
+        filename = input_image_path.split("/")[-1][:-4]
+
+        subprocess.run(f'assets/nvcompress.exe -bc3 "{input_image_path}" "{texture_path}/{filename}.dds"')
+
 
     def dds_to_psg(self,dds_path,alias):
         os.chdir(f"{self.cwd}/assets/PsgCliTool")
@@ -124,8 +128,6 @@ class logoconverter():
         
 if __name__ == "__main__":
     logoconverter2 = logoconverter()
-    #a = logoconverter.rw_hash64_string(f"206.Texture", 0xcbf29ce484222325)
-    #a = logoconverter.convert(logoconverter.cwd, "206")
-    hash:bytes = logoconverter2.rw_hash64_string(f"7812768368712.Texture", 0xcbf29ce484222325)
+    a = logoconverter.convert(logoconverter.cwd, "206")
 
     print(hash.hex())
