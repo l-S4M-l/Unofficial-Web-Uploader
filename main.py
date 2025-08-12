@@ -17,6 +17,9 @@ from S3RecipeHandler.AssetList import AssetList
 from S3RecipeHandler.Model import Model
 from S3RecipeHandler.texture import Texture
 from S3RecipeHandler.Helpers import Helpers
+from S3RecipeHandler.BodyModBlock import body_mod_blocks
+from S3RecipeHandler.graphic_vector_list import graphic_vector_list
+
 from components.database_handler import database
 import psutil
 import pygetwindow as gw
@@ -32,7 +35,7 @@ from werkzeug.serving import make_server
 import json
 
 
-version = "1.1.0"
+version = "1.2.0"
 
 
 class logo_worker(QtCore.QThread):
@@ -342,14 +345,53 @@ class mainUi(QtWidgets.QWidget, Ui_Form):
 		with open(f"{folder}/{files[0]}","rb") as file:
 			if "rson" in files[0]:
 				backup_recipe_json = json.loads(file.read())
+				if "after_bytes" in backup_recipe_json:
+					if backup_recipe_json["after_bytes"] != None:
+						body_mods, graphic_vectors = self.backwards_compat(backup_recipe_json["after_bytes"])
+
+					backup_recipe_json["body_mods"] = body_mods
+					backup_recipe_json["graphic_vectors"] = graphic_vectors
+					del backup_recipe_json["after_bytes"]
+
+
+
 				backup_recipe = Recipe(Recipe_Json=backup_recipe_json)
+				backup_recipe_bytes = backup_recipe.get_bytes()
+
+
 			elif "recipe" in files[0]:
 				backup_recipe = Recipe(recipe_bytes=file.read())
+				backup_recipe_bytes = backup_recipe.get_bytes()
 
-		self.rpcs3_process.write_recipe(backup_recipe.get_bytes())
+		self.rpcs3_process.write_recipe(backup_recipe_bytes)
 
 		self.popup("backup Loaded")
 
+	def backwards_compat(self,after_bytes):
+		index = 0
+
+		start_index = index + 4
+		index = start_index + 76
+
+		after_bytes = bytearray(after_bytes)
+
+		print(bytearray(after_bytes[start_index:index]).hex())
+
+		body_mods = body_mod_blocks(asset_bytes=after_bytes[start_index:index])
+
+		start_index = index+20
+		index = start_index + 80
+
+		graphic_vectors = graphic_vector_list(vector_list_bytes=after_bytes[start_index:index])
+
+		r = Recipe()
+
+		r.body_mods = body_mods
+		r.graphic_vectors = graphic_vectors
+
+		rjson = r.to_json()
+
+		return (rjson["body_mods"], rjson["graphic_vectors"])
 
 	def progress_update(self, message, percentage):
 		self.progress_message = cast(QtWidgets.QLabel, self.progress_message)
